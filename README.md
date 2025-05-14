@@ -3,23 +3,32 @@
 ## Objective
 Validate major functionalities of the FastAPI implementation using automated Java-based API testing.
 
-## Strategy
-
-- Each test covers one full CRUD operation to ensure atomicity.
-- Positive and negative scenarios
-- Request chaining is implemented using shared variables (user ID).
-- Tests include both success and failure paths (e.g., 200, 400, 404).
-- Config-driven to easily switch between environments
-- TestNG + RestAssured + Extent report
-- GitHub Actions CI pipeline
-
-## CI/CD
+## Tech Stack
+- Java 17
+- RestAssured
+- TestNG
+- ExtentReports
+- GitHub Actions
 - GitHub Actions is used to run tests automatically on each push.
-- Test report is stored as an artifact for each run.
+
+## Strategy
+- Covers all CRUD operations (Create, Read, Update, Delete)
+- Validates:
+  - HTTP status codes
+  - Response bodies
+  - Headers
+  - Error handling (negative tests)
+- Supports request chaining (output of one request used in another)
+
+## Maintainability
+- Modular test structure 
+- Environment configuration via `config.properties`
+
+## Reporting
+- Extent Reports generated after test runs
+- Shows Pass/Fail/Skip clearly
 
 ## Challenges
 - Handling dynamic data from FastAPI.
 - Mitigated using JSON schema validations and custom data generators.
 
-```bash
-mvn clean test
