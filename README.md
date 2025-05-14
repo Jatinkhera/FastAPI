@@ -30,5 +30,12 @@ Validate major functionalities of the FastAPI implementation using automated Jav
 
 ## Challenges
 - Handling dynamic data from FastAPI.
-- Mitigated using JSON schema validations and custom data generators.
+  
+## Environment Configuration
+Challenge: Support for dev, QA, prod.
+Solution: Load base URL from `config.properties` using `ConfigManager.java`
+
+## Report Clarity
+Challenge: Making reports useful.
+Solution: Used ExtentReports for structured and readable HTML output.
 
