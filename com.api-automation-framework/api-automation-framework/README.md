@@ -1,26 +1,40 @@
-# Java API Automation Framework
+# API Automation Framework (Java + RestAssured)
 
 ## Objective
-To validate FastAPI endpoints using a scalable and reusable API test framework.
+Validate major functionalities of the FastAPI implementation using automated Java-based API testing.
 
-## Features
-- Full CRUD testing with request chaining
-- Positive & negative scenarios
-- Configurable environments
-- Allure reports
-- GitHub Actions CI/CD
+## Tech Stack
+- Java 17
+- RestAssured
+- TestNG
+- ExtentReports
+- GitHub Actions
+- GitHub Actions is used to run tests automatically on each push.
 
-## Setup
+## Strategy
+- Covers all CRUD operations (Create, Read, Update, Delete)
+- Validates:
+  - HTTP status codes
+  - Response bodies
+  - Headers
+  - Error handling (negative tests)
+- Supports request chaining (output of one request used in another)
 
-1. Update `config.properties` with your FastAPI base URL.
-2. Run `mvn clean test` to execute tests.
-3. Run `mvn allure:report` to generate reports.
+## Maintainability
+- Modular test structure 
+- Environment configuration via `config.properties`
 
-## CI/CD
-
-CI pipeline is configured using GitHub Actions (`.github/workflows/ci.yml`) to run tests on every push.
+## Reporting
+- Extent Reports generated after test runs
+- Shows Pass/Fail/Skip clearly
 
 ## Challenges
+- Handling dynamic data from FastAPI.
+  
+## Environment Configuration
+Challenge: Support for dev, QA, prod.
+Solution: Load base URL from `config.properties` using `ConfigManager.java`
 
-- Mapping the dynamic nature of request chaining
-- Ensuring consistent test data cleanup (handled via delete)
+## Report Clarity
+Challenge: Making reports useful.
+Solution: Used ExtentReports for structured and readable HTML output.
