@@ -1,67 +1,95 @@
 package tests;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 import config.ConfigManager;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import org.json.JSONObject;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class UserApiTest {
-    private static String baseUrl = ConfigManager.get("baseUrl");
-    private static int userId;
+	private static String base_url = ConfigManager.get("base_url");
+    private String token;
+    private String userId;
+
+    @BeforeClass
+    public void getToken() {
+        JSONObject credentials = new JSONObject();
+        credentials.put("client_id", ConfigManager.get("client_id"));
+        credentials.put("client_secret", ConfigManager.get("client_secret"));
+
+        Response res = RestAssured
+                .given()
+                .contentType("application/json")
+                .body(credentials.toString())
+                .post(ConfigManager.get("token_url"));
+
+        Assert.assertEquals(res.getStatusCode(), 200);
+        token = res.jsonPath().getString("access_token");
+    }
 
     @Test(priority = 1)
-    public void createUser() {
+    public void testCreateUser() {
         JSONObject payload = new JSONObject();
         payload.put("name", "Jatin");
-        payload.put("email", "jatin@.com");
+        payload.put("email", "jatin@abc.com");
 
-        Response response = RestAssured.given()
-                .contentType(ContentType.JSON)
+        Response res = RestAssured
+                .given()
+                .auth().oauth2(token)
+                .contentType("application/json")
                 .body(payload.toString())
-                .post(baseUrl + "/users");
+                .post(ConfigManager.get("base_url") + "/users");
 
-        Assert.assertEquals(response.getStatusCode(), 201);
-        userId = response.jsonPath().getInt("id");
+        Assert.assertEquals(res.getStatusCode(), 201);
+        userId = res.jsonPath().getString("id");
     }
 
-    @Test(priority = 2, dependsOnMethods = "createUser")
-    public void getUser() {
-        Response response = RestAssured.get(baseUrl + "/users/" + userId);
-        Assert.assertEquals(response.getStatusCode(), 200);
-        Assert.assertEquals(response.jsonPath().getString("name"), "Jatin");
+    @Test(priority = 2, dependsOnMethods = "testCreateUser")
+    public void testGetUser() {
+        Response res = RestAssured
+                .given()
+                .auth().oauth2(token)
+                .get(ConfigManager.get("base_url") + "/users/" + userId);
+
+        Assert.assertEquals(res.getStatusCode(), 200);
+        Assert.assertEquals(res.jsonPath().getString("name"), "Jatin");
     }
 
-    @Test(priority = 3, dependsOnMethods = "getUser")
-    public void updateUser() {
-        JSONObject payload = new JSONObject();
-        payload.put("name", "Johnny");
+    @Test(priority = 3, dependsOnMethods = "testGetUser")
+    public void testUpdateUser() {
+        JSONObject update = new JSONObject();
+        update.put("name", "Jatin khera Updated");
 
-        Response response = RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body(payload.toString())
-                .put(baseUrl + "/users/" + userId);
+        Response res = RestAssured
+                .given()
+                .auth().oauth2(token)
+                .contentType("application/json")
+                .body(update.toString())
+                .put(ConfigManager.get("base_url") + "/users/" + userId);
 
-        Assert.assertEquals(response.getStatusCode(), 200);
-        Assert.assertEquals(response.jsonPath().getString("name"), "Johnny");
+        Assert.assertEquals(res.getStatusCode(), 200);
     }
 
-    @Test(priority = 4, dependsOnMethods = "updateUser")
-    public void deleteUser() {
-        Response response = RestAssured.delete(baseUrl + "/users/" + userId);
-        Assert.assertEquals(response.getStatusCode(), 204);
-    }
+    @Test(priority = 4, dependsOnMethods = "testUpdateUser")
+    public void testDeleteUser() {
+        Response res = RestAssured
+                .given()
+                .auth().oauth2(token)
+                .delete(ConfigManager.get("base_url") + "/users/" + userId);
 
+        Assert.assertEquals(res.getStatusCode(), 204);
+    }
+    
     @Test(priority = 5)
     public void createUserWithInvalidData() {
         JSONObject payload = new JSONObject(); // missing required fields
 
         Response response = RestAssured.given()
-                .contentType(ContentType.JSON)
+                .contentType("application/json")
                 .body(payload.toString())
-                .post(baseUrl + "/users");
+                .post(base_url + "/users");
 
         Assert.assertTrue(response.getStatusCode() >= 400);
     }
