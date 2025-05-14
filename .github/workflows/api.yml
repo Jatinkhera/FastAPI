@@ -22,9 +22,7 @@ jobs:
       uses: actions/upload-artifact@v4
 
     - name: 'Upload Artifact'
-      uses: actions/upload-pages-artifact@v3
-      with:
-          path: ./public
+      uses: actions/upload-artifact@v3
    
     - name: Build with Maven
       run: mvn clean install
